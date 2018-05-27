@@ -1,0 +1,8 @@
+# Dependencies
+vendor/*
+!vendor/manifest
+
+# Binaries and data
+bin/
+pkg/
+*.db
