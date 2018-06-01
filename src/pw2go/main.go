@@ -11,9 +11,14 @@ func main() {
 	if err := pm.Init(); err != nil {
 		log.Fatal(err)
 	}
+	defer pm.Close()
 	if len(pm.masterhash) == 0 {
 		pm.SetMaster("mastertest")
 	}
-	defer pm.Close()
 	fmt.Printf("%v\n", pm)
+	err := pm.ChangeMaster("mastertest", "mastertest2")
+	fmt.Printf("%v\n", pm)
+	if err != nil {
+		println(err.Error())
+	}
 }
