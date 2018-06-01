@@ -36,7 +36,7 @@ func generateKey(key string, context string, length int) ([]byte, error) {
 		return nil, errors.New(BADKEY)
 	}
 	hash := sha512.Sum512([]byte(key + context))
-	return hash[:length], errors.New("Not implemented")
+	return hash[:length], nil
 }
 
 // Encrypt string using AES in GCM mode, return object with base64 encoding or ciphertext and nonce
@@ -59,11 +59,10 @@ func encryptAESGCM(plain string, key string, context string, length int) (AESCip
 	if err != nil {
 		return res, err
 	}
-	plainbytes := []byte(plain)
-	aesgcm.Seal(plainbytes[:0], nonce, plainbytes, nil)
+	ciphertext := aesgcm.Seal(nil, nonce, []byte(plain), nil)
 	res = AESCipher{
-		base64.StdEncoding.EncodeToString(plainbytes[:]),
-		base64.StdEncoding.EncodeToString(nonce[:]),
+		base64.StdEncoding.EncodeToString(ciphertext),
+		base64.StdEncoding.EncodeToString(nonce),
 	}
 	return res, nil
 }

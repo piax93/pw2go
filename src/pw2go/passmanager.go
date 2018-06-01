@@ -27,6 +27,10 @@ const (
 	BADMASTER = "Bad master password"
 	// Set master error
 	SETMASTERERROR = "Master hash already present"
+	// Password already present
+	ALREADYPRESENT = "Password already present for this service"
+	// Service not found
+	NOTFOUND = "Service not found"
 	// AES key length
 	KLEN = 16
 )
@@ -104,7 +108,24 @@ func (pm *PasswordManager) AddPassword(service string, password string, master s
 	if pm.masterhash != sha256sum(master) {
 		return errors.New(BADMASTER)
 	}
-	return errors.New("Not implemented")
+	if _, err := pm.GetPassword(service, master); err == nil || err.Error() != NOTFOUND {
+		return errors.New(ALREADYPRESENT)
+	}
+	cipherobj, err := encryptAESGCM(password, master, service, KLEN)
+	if err != nil {
+		return err
+	}
+	tx, err := pm.db.Begin()
+	stmt, err := tx.Prepare(fmt.Sprintf("INSERT INTO %s VALUES(?, ?, ?)", pm.passtable))
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if _, err := stmt.Exec(service, cipherobj.ciphertext, cipherobj.nonce); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
 }
 
 // Get password from database
@@ -112,7 +133,22 @@ func (pm *PasswordManager) GetPassword(service string, master string) (string, e
 	if pm.masterhash != sha256sum(master) {
 		return "", errors.New(BADMASTER)
 	}
-	return "", errors.New("Not implemented")
+	stmt, err := pm.db.Prepare(fmt.Sprintf("SELECT value, nonce FROM %s WHERE service = ?", pm.passtable))
+	if err != nil {
+		return "", err
+	}
+	rows, err := stmt.Query(service)
+	if err != nil {
+		return "", err
+	}
+	if !rows.Next() {
+		return "", errors.New(NOTFOUND)
+	}
+	var cipherobj AESCipher
+	if err := rows.Scan(&cipherobj.ciphertext, &cipherobj.nonce); err != nil {
+		return "", err
+	}
+	return decryptAESGCM(&cipherobj, master, service, KLEN)
 }
 
 // Change master password
@@ -145,7 +181,7 @@ func (pm *PasswordManager) ChangeMaster(oldmaster string, newmaster string) erro
 		return err
 	}
 	for rows.Next() {
-		rows.Scan(service, cipherobj.ciphertext, cipherobj.nonce)
+		rows.Scan(&service, &cipherobj.ciphertext, &cipherobj.nonce)
 		plainval, err = decryptAESGCM(&cipherobj, oldmaster, service, KLEN)
 		if err != nil {
 			tx.Rollback()
