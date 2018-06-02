@@ -2,6 +2,12 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/andlabs/ui",
+			"repository": "https://github.com/andlabs/ui",
+			"revision": "6c3bda44d3039e3721c06516be3ab9ce9cbd48cc",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/mattn/go-sqlite3",
 			"repository": "https://github.com/mattn/go-sqlite3",
 			"revision": "323a32be5a2421b8c7087225079c6c900ec397cd",

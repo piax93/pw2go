@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -19,6 +20,7 @@ type PasswordManager struct {
 	mastertable string
 	passtable   string
 	masterhash  string
+	services    map[string]bool
 	db          *sql.DB
 }
 
@@ -38,7 +40,7 @@ const (
 // Initialize password manager object
 func (pm *PasswordManager) Init() error {
 	var err error
-	pm.db, err = sql.Open("sqlite3", "./"+pm.dbname+".db")
+	pm.db, err = sql.Open("sqlite3", fmt.Sprintf("./%s.db", pm.dbname))
 	if err != nil {
 		return err
 	}
@@ -51,12 +53,12 @@ func (pm *PasswordManager) Init() error {
 	query = `CREATE TABLE IF NOT EXISTS %s (
 		service VARCHAR(128) PRIMARY KEY,
 		value VARCHAR(1024) NOT NULL,
-		nonce VARCHAR(64) NOT NULL UNIQUE
+		nonce VARCHAR(64) NOT NULL
 	);`
 	if _, err := pm.db.Exec(fmt.Sprintf(query, pm.passtable)); err != nil {
 		return err
 	}
-	rows, err := pm.db.Query("SELECT * FROM " + pm.mastertable + " LIMIT 1")
+	rows, err := pm.db.Query(fmt.Sprintf("SELECT * FROM %s LIMIT 1;", pm.mastertable))
 	if err != nil {
 		return err
 	}
@@ -65,6 +67,19 @@ func (pm *PasswordManager) Init() error {
 		if err := rows.Scan(&pm.masterhash); err != nil {
 			pm.masterhash = ""
 			return err
+		}
+	}
+	pm.services = make(map[string]bool)
+	rows, err = pm.db.Query(fmt.Sprintf("SELECT service FROM %s;", pm.passtable))
+	if err != nil {
+		return err
+	}
+	var serv string
+	for rows.Next() {
+		if err = rows.Scan(&serv); err != nil {
+			return err
+		} else {
+			pm.services[serv] = true
 		}
 	}
 	return nil
@@ -108,7 +123,7 @@ func (pm *PasswordManager) AddPassword(service string, password string, master s
 	if pm.masterhash != sha256sum(master) {
 		return errors.New(BADMASTER)
 	}
-	if _, err := pm.GetPassword(service, master); err == nil || err.Error() != NOTFOUND {
+	if pm.services[service] {
 		return errors.New(ALREADYPRESENT)
 	}
 	cipherobj, err := encryptAESGCM(password, master, service, KLEN)
@@ -116,7 +131,7 @@ func (pm *PasswordManager) AddPassword(service string, password string, master s
 		return err
 	}
 	tx, err := pm.db.Begin()
-	stmt, err := tx.Prepare(fmt.Sprintf("INSERT INTO %s VALUES(?, ?, ?)", pm.passtable))
+	stmt, err := tx.Prepare(fmt.Sprintf("INSERT INTO %s VALUES(?, ?, ?);", pm.passtable))
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -125,7 +140,11 @@ func (pm *PasswordManager) AddPassword(service string, password string, master s
 		tx.Rollback()
 		return err
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	if err == nil {
+		pm.services[service] = true
+	}
+	return err
 }
 
 // Get password from database
@@ -133,7 +152,10 @@ func (pm *PasswordManager) GetPassword(service string, master string) (string, e
 	if pm.masterhash != sha256sum(master) {
 		return "", errors.New(BADMASTER)
 	}
-	stmt, err := pm.db.Prepare(fmt.Sprintf("SELECT value, nonce FROM %s WHERE service = ?", pm.passtable))
+	if !pm.services[service] {
+		return "", errors.New(NOTFOUND)
+	}
+	stmt, err := pm.db.Prepare(fmt.Sprintf("SELECT value, nonce FROM %s WHERE service = ?;", pm.passtable))
 	if err != nil {
 		return "", err
 	}
