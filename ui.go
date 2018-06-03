@@ -1,13 +1,19 @@
 package main
 
 import (
-	"github.com/andlabs/ui"
+	"net/url"
+
+	"github.com/zserge/webview"
 )
 
 func startUI(pm *PasswordManager) {
-	if err := ui.Main(func() {
-
-	}); err != nil {
-		panic(err)
-	}
+	mainui, _ := Asset("ui/main.html")
+	wv := webview.New(webview.Settings{
+		URL:       "data:text/html," + url.PathEscape(string(mainui)),
+		Title:     "PW2GO",
+		Width:     400,
+		Height:    400,
+		Resizable: true,
+	})
+	wv.Run()
 }

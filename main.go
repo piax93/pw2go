@@ -10,5 +10,5 @@ func main() {
 	if len(pm.masterhash) == 0 {
 		pm.SetMaster("mastertest")
 	}
-	// startUI(&pm)
+	startUI(&pm)
 }

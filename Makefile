@@ -1,32 +1,32 @@
 PRJNAME=pw2go
 TARGET=bin/$(PRJNAME)$(EXT)
 SOURCES=$(wildcard *.go)
+WINFLAGS="-ldflags='-H windowsgui'"
 
-.PHONY: run linux windows deps clean init
+.PHONY: run linux windows xwindows clean init
 
 linux:
 	make $(TARGET) CC=gcc CXX=g++ GOOS=linux
 
+xwindows:
+	make $(TARGET).exe CC=x86_64-w64-mingw32-gcc-win32 CXX=x86_64-w64-mingw32-g++-win32 GOOS=windows EXT=.exe FLAGS=$(WINFLAGS)
+
 windows:
-	make $(TARGET).exe CC=x86_64-w64-mingw32-gcc-win32 CXX=x86_64-w64-mingw32-g++-win32 GOOS=windows EXT=.exe
+	make $(TARGET).exe CC=gcc CXX=g++ GOOS=windows EXT=.exe FLAGS=$(WINFLAGS)
 
 $(TARGET): $(SOURCES)
-	CGO_ENABLED=1 CC=$(CC) CXX=$(CXX) GOOS=$(GOOS) go build
+	go-bindata ui
+	CGO_ENABLED=1 CC=$(CC) CXX=$(CXX) GOOS=$(GOOS) go build $(FLAGS)
 	mkdir -p $(dir $(TARGET))
 	mv $(notdir $(TARGET)) $(TARGET)
 
 init:
 	go get -u github.com/FiloSottile/gvt
-
-deps: init
+	go get -u github.com/jteeuwen/go-bindata/...
 	gvt restore
-	cd vendor/github.com/andlabs/ui; \
-		wget https://github.com/andlabs/ui/raw/master/libui_windows_amd64.a; \
-		wget https://github.com/andlabs/ui/raw/master/libui_windows_amd64.res.o; \
-		wget https://github.com/andlabs/ui/raw/master/libui_linux_amd64.a;
 
 run:
-	bin/$(PRJNAME)$(EXT)
+	$(TARGET)
 
 clean:
 	rm -Rf bin pkg
