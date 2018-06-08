@@ -1,0 +1,66 @@
+* {
+    user-select: none;
+}
+
+body {
+    background-color: #DDD;
+    margin: 0;
+    padding: 0;
+}
+
+#header {
+    display: block;
+    position: fixed;
+    text-align: center;
+    vertical-align: center;
+    margin: 0;
+    top: 0;
+    width: 100%;
+    padding: 5px 0;
+    z-index: 99;
+}
+
+h1 {
+    margin: 0 auto;
+    font-family: Arial, Helvetica, sans-serif;
+    font-variant: small-caps;
+    color: white;
+}
+
+#appmain {
+    margin-top: 30px;
+    padding: 15px 6px;
+    overflow-y: auto;
+}
+
+#servicelist {
+    margin-top: 20px;
+    display: block;
+}
+
+li.service.box {
+    padding: 0;
+    margin-bottom: 4px;
+    position: relative;
+}
+
+li.service.box div {
+    cursor: pointer;
+    padding: 0.5em;
+    margin-bottom: 4px;
+}
+
+li.service.box div:hover {
+    background-color: #EEE;
+}
+
+li.service.box div:active {
+    background-color: #FFB74D;
+}
+
+li.service.box a.delete {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 10;
+}

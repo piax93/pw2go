@@ -1,9 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
+    <meta charset="utf-8">
+    <script>
+        function injectJS(js) {
+            var script = document.createElement('script');
+            var head = document.getElementsByTagName('head')[0];
+            script.setAttribute('type', 'text/javascript');
+            script.appendChild(document.createTextNode(js));
+            head.appendChild(script);
+        }
+    </script>
 </head>
 <body>
-	<h1>Password2Go</h1>
+    <div id="header" class="has-background-danger">
+        <h1 id="title" class="title is-4 has-text-light">Password2Go</h1>
+    </div>
+    <div id="appmain">
+        <input id="addbtn" class="button is-primary" type="button" value="ADD">
+        <ul id="servicelist" class=""></ul>
+    </div>
 </body>
 </html>

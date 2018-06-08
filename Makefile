@@ -1,6 +1,6 @@
 PRJNAME=pw2go
 TARGET=bin/$(PRJNAME)$(EXT)
-SOURCES=$(wildcard *.go)
+SOURCES=$(wildcard *.go) $(wildcard ui/*)
 WINFLAGS="-ldflags='-H windowsgui'"
 
 .PHONY: run linux windows xwindows clean init
@@ -15,7 +15,9 @@ windows:
 	make $(TARGET).exe CC=gcc CXX=g++ GOOS=windows EXT=.exe FLAGS=$(WINFLAGS)
 
 $(TARGET): $(SOURCES)
-	go-bindata ui
+	mkdir -p ui/min
+	minify -o ui/min ui
+	go-bindata ui/min
 	CGO_ENABLED=1 CC=$(CC) CXX=$(CXX) GOOS=$(GOOS) go build $(FLAGS)
 	mkdir -p $(dir $(TARGET))
 	mv $(notdir $(TARGET)) $(TARGET)
@@ -23,6 +25,7 @@ $(TARGET): $(SOURCES)
 init:
 	go get -u github.com/FiloSottile/gvt
 	go get -u github.com/jteeuwen/go-bindata/...
+	go get -u github.com/tdewolff/minify/cmd/minify
 	gvt restore
 
 run:

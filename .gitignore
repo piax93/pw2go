@@ -7,3 +7,4 @@ bin/
 pkg/
 *.db
 bindata.go
+ui/min

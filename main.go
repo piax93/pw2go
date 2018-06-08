@@ -10,5 +10,7 @@ func main() {
 	if len(pm.masterhash) == 0 {
 		pm.SetMaster("mastertest")
 	}
+	pm.AddPassword("service1", "password1", "mastertest")
+	pm.AddPassword("service2", "password2", "mastertest")
 	startUI(&pm)
 }
