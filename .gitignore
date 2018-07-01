@@ -2,9 +2,12 @@
 vendor/*
 !vendor/manifest
 
-# Binaries and data
+# Binaries and generated files
 bin/
 pkg/
 *.db
 bindata.go
 ui/min
+
+# IDE files
+.vscode

@@ -7,13 +7,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Name of the service and its password
+// Password Struct with the name of the service and its password
 type Password struct {
 	service string
 	value   string
 }
 
-// PasswordManager class with database info
+// PasswordManager Struct with database info
 type PasswordManager struct {
 	dbname      string
 	mastertable string
@@ -24,19 +24,19 @@ type PasswordManager struct {
 }
 
 const (
-	// Message for wrong password input
+	// BADMASTER Message for wrong password input
 	BADMASTER = "Bad master password"
-	// Set master error
+	// SETMASTERERROR Message for SetMaster error
 	SETMASTERERROR = "Master hash already present"
-	// Password already present
+	// ALREADYPRESENT Message for password already present
 	ALREADYPRESENT = "Password already present for this service"
-	// Service not found
+	// NOTFOUND Message for service not found
 	NOTFOUND = "Service not found"
-	// AES key length
+	// KLEN AES key length
 	KLEN = 16
 )
 
-// Initialize password manager object
+// Init Initialize password manager object
 func (pm *PasswordManager) Init() error {
 	var err error
 	pm.db, err = sql.Open("sqlite3", fmt.Sprintf("./%s.db", pm.dbname))
@@ -77,9 +77,8 @@ func (pm *PasswordManager) Init() error {
 	for rows.Next() {
 		if err = rows.Scan(&serv); err != nil {
 			return err
-		} else {
-			pm.services[serv] = true
 		}
+		pm.services[serv] = true
 	}
 	return nil
 }
@@ -100,7 +99,7 @@ func setSingleValueTable(tx *sql.Tx, table string, value string) error {
 	return nil
 }
 
-// Set master password (if unset)
+// SetMaster sets master password (if unset)
 func (pm *PasswordManager) SetMaster(master string) error {
 	if pm.masterhash != "" {
 		return errors.New(SETMASTERERROR)
@@ -117,7 +116,7 @@ func (pm *PasswordManager) SetMaster(master string) error {
 	return tx.Commit()
 }
 
-// Add password to database
+// AddPassword adds a password to database
 func (pm *PasswordManager) AddPassword(service string, password string, master string) error {
 	if pm.masterhash != sha256sum(master) {
 		return errors.New(BADMASTER)
@@ -146,7 +145,7 @@ func (pm *PasswordManager) AddPassword(service string, password string, master s
 	return err
 }
 
-// Get password from database
+// GetPassword retrieves a service's password from database
 func (pm *PasswordManager) GetPassword(service string, master string) (string, error) {
 	if pm.masterhash != sha256sum(master) {
 		return "", errors.New(BADMASTER)
@@ -172,7 +171,7 @@ func (pm *PasswordManager) GetPassword(service string, master string) (string, e
 	return decryptAESGCM(&cipherobj, master, service, KLEN)
 }
 
-// Change master password
+// ChangeMaster changes the master password
 func (pm *PasswordManager) ChangeMaster(oldmaster string, newmaster string) error {
 	// Check old master
 	if pm.masterhash != sha256sum(oldmaster) {

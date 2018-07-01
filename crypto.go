@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	// Error for bad key length
+	// BADKEY Error for bad key length
 	BADKEY = "Unsupported key size"
 )
 
-// Cipher object for AES GCM mode
+// AESCipher Cipher object for AES GCM mode
 type AESCipher struct {
 	ciphertext string
 	nonce      string
