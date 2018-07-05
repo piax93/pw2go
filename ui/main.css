@@ -72,3 +72,11 @@ li.service.box a.delete {
     right: 6px;
     z-index: 10;
 }
+
+.modal-content .buttons {
+    margin-top: 0.8em;
+}
+
+.modal-content .input {
+    margin-top: 0.5em;
+}

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/zserge/webview"
-	"io/ioutil"
 	"net/url"
+	"path"
 	"strings"
 )
 
@@ -45,19 +45,18 @@ func (m *UIManager) UpdateList() {
 // Load webview asset file as string in a map
 func loadAssets(directory string) (map[string]string, error) {
 	res := make(map[string]string)
-	files, err := ioutil.ReadDir(directory)
-	if err != nil {
-		return res, err
-	}
+	files := AssetNames()
 	if !strings.HasSuffix(directory, "/") {
 		directory += "/"
 	}
 	for _, f := range files {
-		content, err := Asset(directory + f.Name())
-		if err != nil {
-			return res, err
+		if strings.HasPrefix(f, directory) {
+			content, err := Asset(f)
+			if err != nil {
+				return res, err
+			}
+			res[path.Base(f)] = string(content)
 		}
-		res[f.Name()] = string(content)
 	}
 	return res, nil
 }
@@ -81,6 +80,7 @@ func startUI(pm *PasswordManager) {
 		wv.Bind("manager", &manager)
 		wv.InjectCSS(assets["bulma.min.css"])
 		wv.InjectCSS(assets["main.css"])
+		wv.Eval(assets["utils.js"])
 		wv.Eval(assets["main.js"])
 		manager.UpdateList()
 	})
