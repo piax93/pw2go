@@ -1,12 +1,14 @@
 PRJNAME=pw2go
 TARGET=bin/$(PRJNAME)$(EXT)
-SOURCES=$(wildcard *.go) $(wildcard ui/*)
-WINFLAGS="-ldflags='-H windowsgui'"
+SOURCES=$(wildcard *.go) $(wildcard ui/*) Makefile
+LINUXFLAGS="-ldflags='-w -s'"
+WINFLAGS="-ldflags='-w -s -H windowsgui'"
 
 .PHONY: run linux windows xwindows clean init
 
 linux:
-	make $(TARGET) CC=gcc CXX=g++ GOOS=linux
+	make $(TARGET) CC=gcc CXX=g++ GOOS=linux FLAGS=$(LINUXFLAGS)
+	strip -s $(TARGET)
 
 xwindows:
 	make $(TARGET).exe CC=x86_64-w64-mingw32-gcc-win32 CXX=x86_64-w64-mingw32-g++-win32 GOOS=windows EXT=.exe FLAGS=$(WINFLAGS)

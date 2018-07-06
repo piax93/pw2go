@@ -17,8 +17,10 @@ function onServiceClick(service, event) {
  */
 function onDeleteClick(service, event) {
     modal('Do you really want to delete ' + service + '?', function(res) {
-        alert(res.button);
-        if(res.button === 'YES') manager.delete(service);
+        if(res.button === 'YES') {
+            manager.delete(service);
+            modal('Service "' + service + '" deleted from database');
+        }
     }, ['YES', 'NO']);
 }
 
@@ -53,7 +55,12 @@ function clearList() {
  */
 function setMaster() {
     modal('Set the master password', function(res){
-        manager.setMaster(res.password);
+        if(res.button === 'SET') {
+            manager.setMaster(res.password);
+            modal('First execution setup completed');
+        } else {
+            manager.die();
+        }
     }, ['SET', 'CANCEL'], [{
             type: 'password',
             name: 'password',

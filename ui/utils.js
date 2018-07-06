@@ -25,7 +25,7 @@ function createNode(tag, id, classes, inner) {
  * @return {DOMElement} Input DOM element.
  */
 function createInput(type, name, hint, value) {
-    var classes = type === 'button' ? ['button', 'is-primary'] : [];
+    var classes = type === 'button' ? ['button', 'is-primary'] : ['input'];
     var res = createNode('input', name, classes);
     res.type = type;
     res.name = name;
@@ -56,21 +56,20 @@ function modal(text, result, buttons, fields) {
         content.appendChild(fields[i]);
     }
     var bcontainer = createNode('div', null, ['buttons', 'is-centered']);
-    for(var i = 0; i < buttons.length; i++) {
-        var b = buttons[i];
+    buttons.forEach(function(b) {
         var be = createInput('button', b, null, b);
-        be.onclick = (function(bname, event) {
+        be.onclick = function(bname, event) {
             if(typeof result === 'function') {
-                var obj = {button: bname};
-                for(var j = 0; j < fields[j]; j++) {
+                var obj = {button: b};
+                for(var j = 0; j < fields.length; j++) {
                     obj[fields[j].name] = fields[j].value;
                 }
                 result(obj);
             }
             document.getElementsByTagName('body')[0].removeChild(body);
-        }).bind(null, b);
+        };
         bcontainer.appendChild(be);
-    }
+    });
     content.appendChild(bcontainer);
     document.getElementsByTagName('body')[0].appendChild(body);
 }

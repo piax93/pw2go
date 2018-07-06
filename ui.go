@@ -26,12 +26,18 @@ func (m *UIManager) Get(service, master string) {
 
 // Delete removes password from database (webview interface)
 func (m *UIManager) Delete(service string) {
-	println(service)
+	if err := (*m.pm).RemovePassword(service); err != nil {
+		panic(err)
+	}
+	m.UpdateList()
+	fmt.Printf("Removed service '%s' from database\n", service)
 }
 
 // SetMaster sets the master password (webview interface)
 func (m *UIManager) SetMaster(master string) {
-
+	if err := (*m.pm).SetMaster(master); err != nil {
+		panic(err)
+	}
 }
 
 // UpdateList updates the service list in the webview
@@ -40,6 +46,11 @@ func (m *UIManager) UpdateList() {
 	for service := range m.pm.services {
 		(*m.wv).Eval(fmt.Sprintf("addService('%s')", service))
 	}
+}
+
+// Terminate app
+func (m *UIManager) Die() {
+	(*m.wv).Terminate()
 }
 
 // Load webview asset file as string in a map
@@ -69,7 +80,7 @@ func startUI(pm *PasswordManager) {
 	}
 	wv := webview.New(webview.Settings{
 		URL:       "data:text/html," + url.PathEscape(assets["main.html"]),
-		Title:     "PW2GO",
+		Title:     "Password2Go",
 		Width:     400,
 		Height:    400,
 		Resizable: true,
@@ -82,6 +93,9 @@ func startUI(pm *PasswordManager) {
 		wv.InjectCSS(assets["main.css"])
 		wv.Eval(assets["utils.js"])
 		wv.Eval(assets["main.js"])
+		if len(pm.masterhash) == 0 {
+			wv.Eval("setMaster()")
+		}
 		manager.UpdateList()
 	})
 	wv.Run()

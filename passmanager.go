@@ -83,7 +83,7 @@ func (pm *PasswordManager) Init() error {
 	return nil
 }
 
-// Update table containing a row with a single value
+// Update table containing a single row with a single value
 func setSingleValueTable(tx *sql.Tx, table string, value string) error {
 	if _, err := tx.Exec(fmt.Sprintf("DELETE FROM %s;", table)); err != nil {
 		return err
@@ -169,6 +169,23 @@ func (pm *PasswordManager) GetPassword(service string, master string) (string, e
 		return "", err
 	}
 	return decryptAESGCM(&cipherobj, master, service, KLEN)
+}
+
+// RemovePassword delete password from database
+// This does not require master confirmation by design (forgetting stuff is allowed)
+func (pm *PasswordManager) RemovePassword(service string) error {
+	if !pm.services[service] {
+		return errors.New(NOTFOUND)
+	}
+	stmt, err := pm.db.Prepare(fmt.Sprintf("DELETE FROM %s WHERE service = ?;", pm.passtable))
+	if err != nil {
+		return err
+	}
+	if _, err := stmt.Exec(service); err != nil {
+		return err
+	}
+	delete(pm.services, service)
+	return nil
 }
 
 // ChangeMaster changes the master password
