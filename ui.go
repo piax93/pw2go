@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/atotto/clipboard"
 	"github.com/zserge/webview"
 	"net/url"
 	"path"
@@ -16,12 +17,33 @@ type UIManager struct {
 
 // Add inserts new password in database (webview interface)
 func (m *UIManager) Add(service, password, master string) {
-
+	if err := (*m.pm).AddPassword(service, password, master); err != nil {
+		if msg := err.Error(); msg == BADMASTER || msg == ALREADYPRESENT {
+			(*m.wv).Eval(fmt.Sprintf("modal('%s')", msg))
+		} else {
+			panic(err)
+		}
+	} else {
+		m.UpdateList()
+		(*m.wv).Eval(fmt.Sprintf("modal('Service <i><b>%s</b></i> added')", service))
+	}
 }
 
 // Get retrieves password from database (webview interface)
 func (m *UIManager) Get(service, master string) {
-
+	res, err := (*m.pm).GetPassword(service, master)
+	if err != nil {
+		if msg := err.Error(); msg == NOTFOUND || msg == BADMASTER {
+			(*m.wv).Eval(fmt.Sprintf("modal('%s')", msg))
+		} else {
+			panic(err)
+		}
+	} else {
+		if err := clipboard.WriteAll(res); err != nil {
+			panic(err)
+		}
+		(*m.wv).Eval("modal('Password copied to clipboard')")
+	}
 }
 
 // Delete removes password from database (webview interface)
@@ -30,7 +52,6 @@ func (m *UIManager) Delete(service string) {
 		panic(err)
 	}
 	m.UpdateList()
-	fmt.Printf("Removed service '%s' from database\n", service)
 }
 
 // SetMaster sets the master password (webview interface)

@@ -7,11 +7,19 @@ function onServiceClick(service, event) {
     for(var i = 0; i < event.target.classList.length; i++) {
         if(event.target.classList[i] == 'delete') return;
     }
-    modal(service);
+    modal('Enter master password', function(res) {
+        if(res.button === 'OK') {
+            manager.get(service, res.master);
+        }
+    }, ['CANCEL', 'OK'], [{
+        type: 'password',
+        name: 'master',
+        hint: 'Master Password'
+    }]);
 }
 
 /**
- * Callback for clickc on service delete button.
+ * Callback for click on service delete button.
  * @param {string}   service - Service name.
  * @param {DOMEvent} event   - Click event.
  */
@@ -19,9 +27,34 @@ function onDeleteClick(service, event) {
     modal('Do you really want to delete ' + service + '?', function(res) {
         if(res.button === 'YES') {
             manager.delete(service);
-            modal('Service "' + service + '" deleted from database');
+            modal('Service <i><b>' + service + '</b></i> deleted from database');
         }
     }, ['YES', 'NO']);
+}
+
+/**
+ * Callback for click on ADD button
+ * @param {DOMEvent} event - Click event.
+ */
+function onAddClick(event) {
+    modal('Add new password', function(res) {
+        if(res.button === 'ADD') {
+            manager.add(res.service, res.password, res.master);
+        }
+    }, ['CANCEL', 'ADD'], [{
+            type: 'text',
+            name: 'service',
+            hint: 'Service Name'
+        }, {
+            type: 'password',
+            name: 'password',
+            hint: 'Password'
+        }, {
+            type: 'password',
+            name: 'master',
+            hint: 'Master password'
+        }
+    ]);
 }
 
 /**
@@ -61,7 +94,7 @@ function setMaster() {
         } else {
             manager.die();
         }
-    }, ['SET', 'CANCEL'], [{
+    }, ['CANCEL', 'SET'], [{
             type: 'password',
             name: 'password',
             hint: 'Password',
@@ -72,3 +105,4 @@ function setMaster() {
 // Export functions
 this.clearList = clearList;
 this.setMaster = setMaster;
+document.getElementById('addbtn').onclick = onAddClick;
