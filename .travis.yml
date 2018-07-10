@@ -3,7 +3,8 @@ language: go
 go:
   - "1.10.x"
 
-sudo: false
+before_install:
+    - sudo apt-get install -qq libwebkit2gtk-4.0-dev
 
 install:
     - make init
