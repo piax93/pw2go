@@ -31,7 +31,7 @@ func allowedLength(length int) bool {
 }
 
 // Generate AES key with a certain length from a string key and context string (used as salt)
-func generateKey(key string, context string, length int) ([]byte, error) {
+func generateKey(key, context string, length int) ([]byte, error) {
 	if !allowedLength(length) {
 		return nil, errors.New(BADKEY)
 	}
@@ -42,7 +42,7 @@ func generateKey(key string, context string, length int) ([]byte, error) {
 // Encrypt string using AES in GCM mode, return object with base64 encoding or ciphertext and nonce.
 // The AES key is generated from a string key and a context string (used as salt).
 // Supported key sizes: 128bits, 256bits
-func encryptAESGCM(plain string, key string, context string, length int) (AESCipher, error) {
+func encryptAESGCM(plain, key, context string, length int) (AESCipher, error) {
 	var res AESCipher
 	genkey, err := generateKey(key, context, length)
 	if err != nil {
@@ -71,7 +71,7 @@ func encryptAESGCM(plain string, key string, context string, length int) (AESCip
 // Decrypt payload encrypted with AES in GCM mode, accepts object with base64 encoding or ciphertext and nonce.
 // The AES key is generated from a string key and a context string (used as salt).
 // Supported key sizes: 128bits, 256bits
-func decryptAESGCM(cipherobj *AESCipher, key string, context string, length int) (string, error) {
+func decryptAESGCM(cipherobj *AESCipher, key, context string, length int) (string, error) {
 	genkey, err := generateKey(key, context, length)
 	if err != nil {
 		return "", err

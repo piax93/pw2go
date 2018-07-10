@@ -72,6 +72,7 @@ function modal(text, result, buttons, fields) {
     });
     content.appendChild(bcontainer);
     document.getElementsByTagName('body')[0].appendChild(body);
+    if(fields.length > 0) fields[0].focus();
 }
 
 // Export functions

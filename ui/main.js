@@ -39,7 +39,11 @@ function onDeleteClick(service, event) {
 function onAddClick(event) {
     modal('Add new password', function(res) {
         if(res.button === 'ADD') {
-            manager.add(res.service, res.password, res.master);
+            if(res.service && res.password) {
+                manager.add(res.service, res.password, res.master);
+            } else {
+                modal('Empty fields are not allowed');
+            }
         }
     }, ['CANCEL', 'ADD'], [{
             type: 'text',
@@ -55,6 +59,31 @@ function onAddClick(event) {
             hint: 'Master password'
         }
     ]);
+}
+
+/**
+ * Callback for click on CHANGE MASTER button
+ * @param {DOMEvent} event - Click event.
+ */
+function onChangeMasterClick(event) {
+    modal('Change master password', function(res) {
+        if(res.button === 'SET') {
+            if(res.master && res.newmaster) {
+                manager.changeMaster(res.master, res.newmaster);
+            } else {
+                modal('Empty fields are not allowed');
+            }
+        }
+    }, ['CANCEL', 'SET'], [{
+            type: 'password',
+            name: 'master',
+            hint: 'Old Master Password'
+        }, {
+            type: 'password',
+            name: 'newmaster',
+            hint: 'New Master Password'
+        }
+    ])
 }
 
 /**
@@ -88,15 +117,15 @@ function clearList() {
  */
 function setMaster() {
     modal('Set the master password', function(res){
-        if(res.button === 'SET') {
-            manager.setMaster(res.password);
+        if(res.button === 'SET' && res.master) {
+            manager.setMaster(res.master);
             modal('First execution setup completed');
         } else {
             manager.die();
         }
     }, ['CANCEL', 'SET'], [{
             type: 'password',
-            name: 'password',
+            name: 'master',
             hint: 'Password',
         }]
     );
@@ -106,3 +135,4 @@ function setMaster() {
 this.clearList = clearList;
 this.setMaster = setMaster;
 document.getElementById('addbtn').onclick = onAddClick;
+document.getElementById('chmbtn').onclick = onChangeMasterClick;

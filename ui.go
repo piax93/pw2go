@@ -18,7 +18,7 @@ type UIManager struct {
 // Add inserts new password in database (webview interface)
 func (m *UIManager) Add(service, password, master string) {
 	if err := (*m.pm).AddPassword(service, password, master); err != nil {
-		if msg := err.Error(); msg == BADMASTER || msg == ALREADYPRESENT {
+		if msg := err.Error(); (*m.pm).NonFatalError(&msg) {
 			(*m.wv).Eval(fmt.Sprintf("modal('%s')", msg))
 		} else {
 			panic(err)
@@ -33,7 +33,7 @@ func (m *UIManager) Add(service, password, master string) {
 func (m *UIManager) Get(service, master string) {
 	res, err := (*m.pm).GetPassword(service, master)
 	if err != nil {
-		if msg := err.Error(); msg == NOTFOUND || msg == BADMASTER {
+		if msg := err.Error(); (*m.pm).NonFatalError(&msg) {
 			(*m.wv).Eval(fmt.Sprintf("modal('%s')", msg))
 		} else {
 			panic(err)
@@ -58,6 +58,17 @@ func (m *UIManager) Delete(service string) {
 func (m *UIManager) SetMaster(master string) {
 	if err := (*m.pm).SetMaster(master); err != nil {
 		panic(err)
+	}
+}
+
+// ChangeMaster allows to set a new master password (webview interface)
+func (m *UIManager) ChangeMaster(master, newmaster string) {
+	if err := (*m.pm).ChangeMaster(master, newmaster); err != nil {
+		if msg := err.Error(); (*m.pm).NonFatalError(&msg) {
+			(*m.wv).Eval(fmt.Sprintf("modal('%s')", msg))
+		} else {
+			panic(err)
+		}
 	}
 }
 
