@@ -8,7 +8,7 @@ Writing this as an exercise to learn the Go programming language.
 ## Build
 
 #### Dependencies
-- **Linux**: `gtk-webkit2`
+- **Linux**: `libwebkit2gtk-4.0-dev`
 - **Windows**: `mingw-w64` toolchain
 
 #### Steps
