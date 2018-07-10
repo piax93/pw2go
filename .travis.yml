@@ -1,0 +1,15 @@
+language: go
+
+go:
+  - "1.10.x"
+
+sudo: false
+
+install:
+    - make init
+
+script:
+    - make linux
+
+os:
+    - linux
