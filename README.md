@@ -1,5 +1,7 @@
 # Password-2-Go
 
+[![Build Status](https://travis-ci.org/piax93/pw2go.svg?branch=master)](https://travis-ci.org/piax93/pw2go)
+
 A simple Go password manager.
 
 Writing this as an exercise to learn the Go programming language.
