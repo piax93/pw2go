@@ -10,6 +10,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/mattn/go-isatty",
+			"repository": "https://github.com/mattn/go-isatty",
+			"vcs": "git",
+			"revision": "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/mattn/go-sqlite3",
 			"repository": "https://github.com/mattn/go-sqlite3",
 			"vcs": "",
@@ -17,11 +25,46 @@
 			"branch": "HEAD"
 		},
 		{
+			"importpath": "github.com/microcosm-cc/bluemonday",
+			"repository": "https://github.com/microcosm-cc/bluemonday",
+			"vcs": "git",
+			"revision": "dafebb5b6ff2861a0d69af64991e10866c19be85",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/zserge/webview",
 			"repository": "https://github.com/zserge/webview",
 			"vcs": "git",
 			"revision": "016c6ffd99f3ba915aea2b026d17e0918322f99b",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/ssh/terminal",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "a49355c7e3f8fe157a85be2f77e6e269a0f89602",
+			"branch": "master",
+			"path": "/ssh/terminal",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/unix",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "1b2967e3c290b7c545b3db0deeda16e9be4f98a2",
+			"branch": "master",
+			"path": "/unix",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/windows",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "1b2967e3c290b7c545b3db0deeda16e9be4f98a2",
+			"branch": "master",
+			"path": "windows",
 			"notests": true
 		}
 	]

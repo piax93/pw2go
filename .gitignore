@@ -3,11 +3,11 @@ vendor/*
 !vendor/manifest
 
 # Binaries and generated files
-bin/
+app/bin/
 pkg/
 *.db
-bindata.go
-ui/min
+app/bindata.go
+app/ui/min
 
 # IDE files
 .vscode

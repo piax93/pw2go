@@ -1,6 +1,6 @@
 PRJNAME=pw2go
-TARGET=bin/$(PRJNAME)$(EXT)
-SOURCES=$(wildcard *.go) $(wildcard ui/*) Makefile
+TARGET=app/bin/$(PRJNAME)$(EXT)
+SOURCES=$(wildcard *.go) $(wildcard app/ui/*) $(wildcard app/*.go) Makefile
 LINUXFLAGS="-ldflags='-w -s'"
 WINFLAGS="-ldflags='-w -s -H windowsgui'"
 
@@ -17,12 +17,11 @@ windows:
 	make $(TARGET).exe CC=gcc CXX=g++ GOOS=windows EXT=.exe FLAGS=$(WINFLAGS)
 
 $(TARGET): $(SOURCES)
-	mkdir -p ui/min
-	minify -o ui/min ui
-	go-bindata ui/min
-	CGO_ENABLED=1 CC=$(CC) CXX=$(CXX) GOOS=$(GOOS) go build $(FLAGS)
+	mkdir -p app/ui/min
+	minify -o app/ui/min app/ui
+	go-bindata -o app/bindata.go app/ui/min
 	mkdir -p $(dir $(TARGET))
-	mv $(notdir $(TARGET)) $(TARGET)
+	CGO_ENABLED=1 CC=$(CC) CXX=$(CXX) GOOS=$(GOOS) go build $(FLAGS) -o $(TARGET) ./app
 
 init:
 	go get -u github.com/FiloSottile/gvt
@@ -34,4 +33,4 @@ run:
 	$(TARGET)
 
 clean:
-	rm -Rf bin pkg
+	rm -Rf app/bin

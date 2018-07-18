@@ -1,4 +1,4 @@
-package main
+package pw2go
 
 import (
 	"crypto/aes"

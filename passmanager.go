@@ -1,4 +1,4 @@
-package main
+package pw2go
 
 import (
 	"database/sql"
@@ -37,6 +37,11 @@ const (
 	// KLEN AES key length
 	KLEN = 16
 )
+
+// Create new password manager
+func NewPassManager(dbname, mastertable, passtable string) *PasswordManager {
+	return &PasswordManager{dbname: dbname, mastertable: mastertable, passtable: passtable}
+}
 
 // NonFatalError checks whether an error message shoud cause a panic or not
 func (pm *PasswordManager) NonFatalError(msg *string) bool {
@@ -109,6 +114,18 @@ func setSingleValueTable(tx *sql.Tx, table, value string) error {
 		return err
 	}
 	return nil
+}
+
+// IsMasterSet checks if a master password was set
+func (pm *PasswordManager) IsMasterSet() bool {
+	return len(pm.masterhash) != 0
+}
+
+// MapServices loops over the list of services and executes a function
+func (pm *PasswordManager) MapServices(mapper func(string)) {
+	for service, _ := range pm.services {
+		mapper(service)
+	}
 }
 
 // SetMaster sets master password (if unset)
